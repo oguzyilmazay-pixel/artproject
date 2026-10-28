@@ -27,7 +27,7 @@ jobs:
           python-version: "3.12"
       - run: pip install requests beautifulsoup4
       - name: Look at what the site shows GitHub
-        run: curl -s -A "Mozilla/5.0" -o page.html -w "status %{http_code}\n" https://camduvar.net/home; head -c 1500 page.html
+        run: curl -s -A "Mozilla/5.0" -o page.html -w "status %{http_code}\n" https://vipbox.fm/home; head -c 1500 page.html
       - run: mkdir site && python serve_playlist.py --out site/playlist.m3u
       - uses: actions/upload-pages-artifact@v3
         with:
