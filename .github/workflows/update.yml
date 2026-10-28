@@ -2,8 +2,8 @@ name: Update playlist
 
 on:
   schedule:
-    - cron: "*/30 * * * *"   # every 30 minutes
-  workflow_dispatch:          # adds a "Run workflow" button for testing
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -21,11 +21,13 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - run: pip install requests beautifulsoup4
+      - name: Look at what the site shows GitHub
+        run: curl -s -A "Mozilla/5.0" -o page.html -w "status %{http_code}\n" https://camduvar.net/home; head -c 1500 page.html
       - run: mkdir site && python serve_playlist.py --out site/playlist.m3u
       - uses: actions/upload-pages-artifact@v3
         with:
