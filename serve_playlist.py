@@ -39,7 +39,7 @@ from bs4 import BeautifulSoup
 # ---------------------------------------------------------------------------
 # CONFIGURATION: edit these
 # ---------------------------------------------------------------------------
-PAGE_URL = "https://vipbox.fm"
+PAGE_URL = ""https://developer.apple.com/streaming/examples/""
 PORT = 8000
 REFRESH_MINUTES = 15
 REQUEST_TIMEOUT = 15
