@@ -41,7 +41,7 @@ from bs4 import BeautifulSoup
 # ---------------------------------------------------------------------------
 # CONFIGURATION: edit these
 # ---------------------------------------------------------------------------
-PAGE_URL = "https://camduvar.net/home"
+PAGE_URL = "https://vipbox.fm/home"
 PORT = 8000
 REFRESH_MINUTES = 15
 REQUEST_TIMEOUT = 15
