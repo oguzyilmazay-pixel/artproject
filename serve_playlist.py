@@ -22,6 +22,8 @@ Install:  pip install requests beautifulsoup4
 Run:      python serve_playlist.py
 Test a saved page without the server:
           python serve_playlist.py --file page.html
+Build once and save to a file (GitHub Actions):
+          python serve_playlist.py --out playlist.m3u
 """
 
 import argparse
@@ -39,11 +41,15 @@ from bs4 import BeautifulSoup
 # ---------------------------------------------------------------------------
 # CONFIGURATION: edit these
 # ---------------------------------------------------------------------------
-PAGE_URL = ""https://developer.apple.com/streaming/examples/""
+PAGE_URL = "https://camduvar.net/home"
 PORT = 8000
 REFRESH_MINUTES = 15
 REQUEST_TIMEOUT = 15
 USER_AGENT = "Mozilla/5.0 (compatible; PortfolioPlaylistBuilder/2.0)"
+
+# Forgive a missing scheme, e.g. "example.com/home" -> "https://example.com/home"
+if not PAGE_URL.startswith(("http://", "https://")):
+    PAGE_URL = "https://" + PAGE_URL
 
 DEFAULT_CATEGORY = "Events"      # used when no category can be found
 
@@ -368,9 +374,9 @@ def crawl_site(session):
             resp.raise_for_status()
             if "html" not in resp.headers.get("Content-Type", "html").lower():
                 continue
-        except Exception:
-            if url == start:
-                raise                    # the start page itself must work
+        except Exception as exc:
+            if url == start:             # the start page itself must work
+                raise RuntimeError(f"Could not load start page {url}: {exc}") from exc
             continue
         pages += 1
 
@@ -460,11 +466,16 @@ class Handler(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--file", help="parse a saved HTML file, print the playlist, and exit")
-    ap.add_argument("--out", help="build the playlist once, save it to this file, and exit (used by GitHub)")
+    ap.add_argument("--out", help="build the playlist once, save it to this file, and exit "
+                                  "(used by GitHub Actions)")
     args = ap.parse_args()
 
     if args.out:
-        playlist, count, strategy = build_playlist()
+        try:
+            playlist, count, strategy = build_playlist()
+        except Exception as exc:
+            print(f"FAILED: {exc}")
+            sys.exit(1)
         with open(args.out, "w", encoding="utf-8") as f:
             f.write(playlist)
         print(f"Saved {count} events to {args.out} via {strategy}")

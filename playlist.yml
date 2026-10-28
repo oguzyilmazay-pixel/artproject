@@ -1,0 +1,33 @@
+# Save this file in your repository as:  .github/workflows/playlist.yml
+name: Update playlist
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"     # every 15 minutes (GitHub may delay runs a few minutes)
+  workflow_dispatch:            # lets you run it by hand from the Actions tab
+
+permissions:
+  contents: write               # needed to commit playlist.m3u back to the repo
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+
+      - name: Build playlist
+        run: python serve_playlist.py --out playlist.m3u
+
+      - name: Commit playlist if it changed
+        run: |
+          git config user.name "playlist-bot"
+          git config user.email "playlist-bot@users.noreply.github.com"
+          git add playlist.m3u
+          git diff --staged --quiet || (git commit -m "Update playlist" && git push)
