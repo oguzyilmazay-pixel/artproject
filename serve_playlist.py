@@ -460,7 +460,15 @@ class Handler(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--file", help="parse a saved HTML file, print the playlist, and exit")
+    ap.add_argument("--out", help="build the playlist once, save it to this file, and exit (used by GitHub)")
     args = ap.parse_args()
+
+    if args.out:
+        playlist, count, strategy = build_playlist()
+        with open(args.out, "w", encoding="utf-8") as f:
+            f.write(playlist)
+        print(f"Saved {count} events to {args.out} via {strategy}")
+        sys.exit(0)
 
     if args.file:
         with open(args.file, encoding="utf-8") as f:
